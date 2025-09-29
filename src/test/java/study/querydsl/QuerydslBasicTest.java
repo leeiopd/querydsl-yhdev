@@ -3,9 +3,10 @@ package study.querydsl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,11 @@ public class QuerydslBasicTest {
   @Autowired
   EntityManager em;
 
-  JPAQueryFactory jpaQueryFactory;
+  JPAQueryFactory queryFactory;
 
   @BeforeEach
   public void before(){
-    jpaQueryFactory = new JPAQueryFactory(em);
+    queryFactory = new JPAQueryFactory(em);
 
     Team teamA = new Team("teamA");
     Team teamB = new Team("teamB");
@@ -59,7 +60,7 @@ public class QuerydslBasicTest {
     // 필드레벨에서 선언해도 됨
 //    JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(em);
 
-    Member findMember = jpaQueryFactory
+    Member findMember = queryFactory
         .select(member)
         .from(member)
         .where(member.username.eq("member1"))
@@ -71,7 +72,7 @@ public class QuerydslBasicTest {
   @Test
   public void search(){
 
-    Member findMember = jpaQueryFactory
+    Member findMember = queryFactory
         .select(member)
         .from(member)
         .where(member.username.eq("member1")
@@ -84,12 +85,38 @@ public class QuerydslBasicTest {
   @Test
   public void searchAndParam(){
 
-    Member findMember = jpaQueryFactory
+    Member findMember = queryFactory
         .select(member)
         .from(member)
         .where(member.username.eq("member1"),
             member.age.eq(10)) // and 조건이 여러개일 때 ,로 구분 가능
         .fetchOne();
+
+    assertThat(findMember.getUsername()).isEqualTo("member1");
+  }
+
+  @Test
+  public void resultFetch(){
+
+    List<Member> fetch = queryFactory
+        .select(member)
+        .fetch();
+
+    Member fetchOne = queryFactory
+        .selectFrom(member)
+        .fetchOne();
+
+    Member fetchFirst = queryFactory
+        .selectFrom(member)
+        .fetchFirst();
+
+    QueryResults<Member> results = queryFactory
+        .selectFrom(member)
+        .fetchResults();
+
+    results.getTotal();
+    List<Member> content = results.getResults();
+
 
     assertThat(findMember.getUsername()).isEqualTo("member1");
   }
