@@ -1,5 +1,7 @@
 package study.querydsl;
 
+import static study.querydsl.entity.QMember.member;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -9,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
-import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
 
 @SpringBootTest
@@ -56,12 +57,11 @@ public class QuerydslBasicTest {
   public void startQuerydsl(){
     // 필드레벨에서 선언해도 됨
 //    JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(em);
-    QMember m = QMember.member;
 
     Member findMember = jpaQueryFactory
-        .select(m)
-        .from(m)
-        .where(m.username.eq("member1"))
+        .select(member)
+        .from(member)
+        .where(member.username.eq("member1"))
         .fetchOne();
 
     Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
