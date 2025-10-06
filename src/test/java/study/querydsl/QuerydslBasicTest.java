@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -576,4 +577,18 @@ public class QuerydslBasicTest {
       System.out.println("userDto = " + userDto);
     }
   }
+
+ @Test
+ public void findDtoByQueryProjection(){
+//   constructor 발식과 비슷하지만, 런타임 이전에 오류를 찾아낼수 있음
+//   - 어노테이션으로 처리하는 편한 방법이지만, queryDsl 라이브러리에 대한 의존성이 생겨버리는 단점...
+   List<MemberDto> result = queryFactory
+           .select(new QMemberDto(member.username, member.age))
+           .from(member)
+           .fetch();
+
+   for (MemberDto memberDto : result) {
+     System.out.println("memberDto = " + memberDto);
+   }
+ }
 }
